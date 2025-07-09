@@ -1,7 +1,12 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+
+def get_ist_timestamp():
+    ist_offset = timedelta(hours=5, minutes=30)
+    ist_time = datetime.utcnow() + ist_offset
+    return ist_time.strftime('%d %B %Y - %I:%M %p IST')
 
 def format_message(event_type, payload):
-    timestamp = datetime.utcnow().strftime('%d %B %Y - %I:%M %p UTC')
+    timestamp = get_ist_timestamp()
 
     if event_type == "push":
         author = payload.get("pusher", {}).get("name", "Unknown")
@@ -20,7 +25,7 @@ def format_message(event_type, payload):
         action = payload.get("action")
         pr = payload.get("pull_request", {})
         if action != "opened":
-            return None  # We only care about newly opened PRs
+            return None
         author = pr.get("user", {}).get("login", "Unknown")
         from_branch = pr.get("head", {}).get("ref", "unknown")
         to_branch = pr.get("base", {}).get("ref", "unknown")
